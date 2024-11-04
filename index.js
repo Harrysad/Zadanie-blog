@@ -9,6 +9,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/express-blog");
 const Post = require('./app/models/PostModel')
 
 const blogRouter = require('./app/router/blogRouter');
+const userRouter = require('./app/router/userRouter');
 
 app.use("/files", express.static("public"));
 
@@ -39,8 +40,10 @@ app.get("/", function (_req, res) {
     names: ["Adam", "Ola", "Kasia", "Tomek"],
   });
 });
+
 /* Routes */
 app.use("/blog", blogRouter);
+app.use("/user", userRouter);
 
 
 app.listen(8080, function () {
