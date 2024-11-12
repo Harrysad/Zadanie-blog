@@ -1,8 +1,12 @@
 const Post = require('../models/PostModel');
+const User = require("../models/UserModel");
 
 module.exports = {
     index: (req, res) => {
-        Post.find({})
+        const findConfig = req.query.authorId ? { author: req.query.authorId } : {};
+
+        Post.find(findConfig)
+            .populate('author')
             .lean()
             .then((posts) => {
                 res.render("blogViews/blog", { posts: posts });
@@ -13,6 +17,8 @@ module.exports = {
     },
     post: (req, res) => {
         Post.findById(req.params.id)
+            .populate('author')
+            .lean()
             .then((post) => {
                 res.render("blogViews/singlePost", post);
             })
@@ -21,8 +27,15 @@ module.exports = {
             });
     },
     create: (req, res) => {
-        const newPost = new Post({ ...req.body, author: "Misio" });
+        const newPost = new Post({ ...req.body, author: res.locals.userId });
         newPost.save();
+
+        User.updateOne(
+            { _id: res.locals.userId },
+            { $push: { posts: newPost._id } }
+        ).catch((err) => {
+            res.send(err);
+        });
 
         res.redirect("/blog");
     },
@@ -38,6 +51,13 @@ module.exports = {
     delete: (req, res) => {
         Post.findByIdAndDelete(req.params.id)
             .then(() => {
+                User.updateOne(
+                    { _id: res.locals.userId },
+                    { $pull: { posts: req.params.id } }
+                ).catch((err) => {
+                    res.send(err);
+                });
+
                 res.redirect("/blog");
             })
             .catch((err) => {

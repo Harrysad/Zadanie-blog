@@ -1,18 +1,24 @@
 <div class="container">
     <h2>Add User</h2>
 
+    {{#if error}}
+        <div class="alert alert-danger" role="a">
+            {{message}}
+        </div>
+    {{/if}}
+
     <form action="/user/signup" method="POST">
         <div class="mb-3">
             <label for="name" class="form-label">User name</label>
-            <input type="text" class="form-control" id="name" name="name">
+            <input type="text" class="form-control" id="name" name="name" value="{{user.name}}">
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">User email</label>
-            <input type="email" class="form-control" id="email" name="email">
+            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}">
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">User password</label>
-            <input type="password" class="form-control" id="password" name="password">
+            <input type="password" class="form-control" id="password" name="password" value="{{user.password}}">
         </div>
         <button class="btn btn-primary">Singup</button>
     </form>
